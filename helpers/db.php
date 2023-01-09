@@ -93,6 +93,7 @@ class uDb extends PDO {
     $prefix = preg_replace('/[^a-z0-9_]/i', '', self::$dbprefix);
     self::$tables['positions'] = $prefix . "positions";
     self::$tables['tracks'] = $prefix . "tracks";
+    self::$tables['quick_links'] = $prefix . "quick_links";
     self::$tables['users'] = $prefix . "users";
     self::$tables['config'] = $prefix . "config";
     self::$tables['ol_layers'] = $prefix . "ol_layers";

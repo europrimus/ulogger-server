@@ -29,6 +29,7 @@ $userId = uUtils::getInt('userid');
 $trackId = uUtils::getInt('trackid');
 $afterId = uUtils::getInt('afterid');
 $last = uUtils::getBool('last');
+$quickLink = uUtils::getString("ql", false);
 
 $positionsArr = [];
 if ($userId) {
@@ -48,6 +49,8 @@ if ($userId) {
   if ($config->publicTracks || ($auth->isAuthenticated() && $auth->isAdmin())) {
     $positionsArr = uPosition::getLastAllUsers();
   }
+} else if ($quickLink){
+  $positionsArr = uPosition::getAllFromQuickLink($quickLink);
 }
 
 $result = [];

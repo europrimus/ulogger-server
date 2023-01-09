@@ -349,6 +349,39 @@ class uPosition {
   }
 
   /**
+   * Get array of all positions
+   *
+   * @param string $quickLink quick link public token of a track
+   * @return uPosition[]|bool Array of uPosition positions, false on error
+   */
+  public static function getAllFromQuickLink($quickLink) {
+    $rules[] = "ql.public_token = " . self::db()->quote($quickLink);
+    $where = "WHERE " . implode(" AND ", $rules);
+
+    $query = "SELECT p.id, " . self::db()->unix_timestamp('p.time') . " AS tstamp, p.user_id, p.track_id,
+              p.latitude, p.longitude, p.altitude, p.speed, p.bearing, p.accuracy, p.provider,
+              p.comment, p.image, u.login, t.name
+              FROM " . self::db()->table('positions') . " p
+              LEFT JOIN " . self::db()->table('users') . " u ON (p.user_id = u.id)
+              LEFT JOIN " . self::db()->table('tracks') . " t ON (p.track_id = t.id)
+              LEFT JOIN " . self::db()->table('quick_links') . " ql ON (ql.track_id = t.id)
+              $where
+              ORDER BY p.time, p.id";
+    $positionsArr = [];
+    try {
+      $result = self::db()->query($query);
+      while ($row = $result->fetch()) {
+        $positionsArr[] = self::rowToObject($row);
+      }
+    } catch (PDOException $e) {
+      // TODO: handle exception
+      syslog(LOG_ERR, $e->getMessage());
+      $positionsArr = false;
+    }
+    return $positionsArr;
+  }
+
+  /**
    * Get array of all positions with image
    *
    * @param int $userId Optional limit to given user id
