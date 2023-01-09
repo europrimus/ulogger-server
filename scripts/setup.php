@@ -73,6 +73,7 @@ $prefix = preg_replace("/[^a-z0-9_]/i", "", $configPrefix);
 $tPositions = $prefix . "positions";
 $tTracks = $prefix . "tracks";
 $tUsers = $prefix . "users";
+$tQuickLinks = $prefix . "quick_links";
 $tConfig = $prefix . "config";
 $tLayers = $prefix . "ol_layers";
 
@@ -205,7 +206,7 @@ switch ($command) {
     $pdo = null;
     $dbName = uDb::getDbName($configDSN);
     $dbName = empty($dbName) ? '""' : "<b>" . htmlentities($dbName) . "</b>";
-    $messages[] = sprintf($langSetup["scriptdesc"], "'$tPositions', '$tTracks', '$tUsers', '$tConfig', '$tLayers'", $dbName);
+    $messages[] = sprintf($langSetup["scriptdesc"], "'$tPositions', '$tTracks', '$tUsers', '$tQuickLinks', '$tConfig', '$tLayers'", $dbName);
     $messages[] = $langSetup["scriptdesc2"];
     $messages[] = "<form method=\"post\" action=\"setup.php?lang=$language\"><input type=\"hidden\" name=\"command\" value=\"setup\"><button>{$langSetup["startbutton"]}</button></form>";
     break;
@@ -216,7 +217,7 @@ switch ($command) {
  * @return array
  */
 function getQueries($dbDriver) {
-  global $tPositions, $tUsers, $tTracks, $tConfig, $tLayers;
+  global $tPositions, $tUsers, $tTracks, $tQuickLinks, $tConfig, $tLayers;
 
   $queries = [];
   switch ($dbDriver) {
@@ -224,6 +225,7 @@ function getQueries($dbDriver) {
       $queries[] = "DROP TABLE IF EXISTS `$tPositions`";
       $queries[] = "DROP TABLE IF EXISTS `$tTracks`";
       $queries[] = "DROP TABLE IF EXISTS `$tUsers`";
+      $queries[] = "DROP TABLE IF EXISTS `$tQuickLinks`";
       $queries[] = "DROP TABLE IF EXISTS `$tConfig`";
       $queries[] = "DROP TABLE IF EXISTS `$tLayers`";
 
@@ -264,6 +266,16 @@ function getQueries($dbDriver) {
                       FOREIGN KEY(`track_id`) REFERENCES `$tTracks`(`id`)
                     ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
+      $queries[] = "CREATE TABLE `$tQuickLinks` (
+                      `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                      `track_id` int(11) NOT NULL,
+                      `public_token` varchar(255) NOT NULL,
+                      `not_after` timestamp DEFAULT NULL,
+                      INDEX `idx_track_id` (`track_id`),
+                      INDEX `idx_public_token` (`public_token`),
+                      FOREIGN KEY(`track_id`) REFERENCES `$tTracks`(`id`)
+                    ) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
       $queries[] = "CREATE TABLE `$tConfig` (
                       `name` varchar(20) PRIMARY KEY,
                       `value` tinyblob NOT NULL
@@ -282,6 +294,7 @@ function getQueries($dbDriver) {
       $queries[] = "DROP TABLE IF EXISTS $tPositions";
       $queries[] = "DROP TABLE IF EXISTS $tTracks";
       $queries[] = "DROP TABLE IF EXISTS $tUsers";
+      $queries[] = "DROP TABLE IF EXISTS $tQuickLinks";
       $queries[] = "DROP TABLE IF EXISTS $tConfig";
       $queries[] = "DROP TABLE IF EXISTS $tLayers";
 
@@ -321,6 +334,16 @@ function getQueries($dbDriver) {
       $queries[] = "CREATE INDEX idx_ptrack_id ON $tPositions(track_id)";
       $queries[] = "CREATE INDEX idx_puser_id ON $tPositions(user_id)";
 
+      $queries[] = "CREATE TABLE $tQuickLinks (
+                      id serial PRIMARY KEY,
+                      track_id int NOT NULL,
+                      public_token varchar(255) NOT NULL,
+                      not_after timestamp(0) DEFAULT NULL,
+                      FOREIGN KEY(track_id) REFERENCES $tTracks(id)
+                    )";
+      $queries[] = "CREATE INDEX idx_track_id ON $tQuickLinks(track_id)";
+      $queries[] = "CREATE INDEX idx_public_token ON $tQuickLinks(public_token)";
+
       $queries[] = "CREATE TABLE $tConfig (
                       name varchar(20) PRIMARY KEY,
                       value bytea NOT NULL
@@ -339,6 +362,7 @@ function getQueries($dbDriver) {
       $queries[] = "DROP TABLE IF EXISTS `$tPositions`";
       $queries[] = "DROP TABLE IF EXISTS `$tTracks`";
       $queries[] = "DROP TABLE IF EXISTS `$tUsers`";
+      $queries[] = "DROP TABLE IF EXISTS `$tQuickLinks`";
       $queries[] = "DROP TABLE IF EXISTS `$tConfig`";
       $queries[] = "DROP TABLE IF EXISTS `$tLayers`";
 
@@ -376,6 +400,16 @@ function getQueries($dbDriver) {
                   )";
       $queries[] = "CREATE INDEX `idx_ptrack_id` ON `$tPositions`(`track_id`)";
       $queries[] = "CREATE INDEX `idx_puser_id` ON `$tPositions`(`user_id`)";
+
+     $queries[] = "CREATE TABLE `$tQuickLinks` (
+                   `id` integer PRIMARY KEY AUTOINCREMENT,
+                   `track_id` integer NOT NULL,
+                   `public_token` varchar(255) NOT NULL,
+                   `not_after` timestamp DEFAULT NULL,
+                   FOREIGN KEY(`track_id`) REFERENCES `$tTracks`(`id`)
+                 )";
+      $queries[] = "CREATE INDEX `idx_track_id` ON `$tQuickLinks`(`track_id`)";
+      $queries[] = "CREATE INDEX `idx_public_token` ON `$tQuickLinks`(`public_token`)";
 
       $queries[] = "CREATE TABLE `$tConfig` (
                       `name` varchar(20) PRIMARY KEY,
