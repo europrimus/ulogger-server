@@ -21,6 +21,7 @@ import uObserve from './observe.js';
 
 /**
  * @class
+ * @property {?uQuickLink} currentQuickLink
  * @property {?uTrack} currentTrack
  * @property {?uUser} currentUser
  * @property {boolean} showLatest
@@ -32,6 +33,7 @@ import uObserve from './observe.js';
 export default class uState {
 
   constructor() {
+    this.currentQuickLink = null;
     this.currentTrack = null;
     this.currentUser = null;
     this.showLatest = false;

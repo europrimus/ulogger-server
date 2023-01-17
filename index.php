@@ -28,6 +28,8 @@ $login = uUtils::postString('user');
 $pass = uUtils::postPass('pass');
 $action = uUtils::postString('action');
 
+$quickLink = uUtils::getString("ql", false);
+
 $config = uConfig::getInstance();
 $lang = (new uLang($config))->getStrings();
 $langsArr = uLang::getLanguages();
@@ -40,7 +42,8 @@ if ($action === 'auth') {
 if ($action === 'auth' && !$auth->isAuthenticated()) {
   $auth->exitWithRedirect('login.php?auth_error=1');
 }
-if ($config->requireAuthentication && !$auth->isAuthenticated()) {
+if ($config->requireAuthentication && !$auth->isAuthenticated()
+    && !$quickLink) {
   $auth->exitWithRedirect('login.php');
 }
 

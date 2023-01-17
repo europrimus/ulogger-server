@@ -26,6 +26,7 @@ import TrackViewModel from './trackviewmodel.js';
 import UserViewModel from './userviewmodel.js';
 import uAlert from './alert.js';
 import uPermalink from './permalink.js';
+import uQuicklink from './quicklink.js';
 import uSpinner from './spinner.js';
 import uState from './state.js';
 
@@ -44,6 +45,7 @@ Promise.all([ domReady, initReady, initLink ])
  */
 function start(linkState) {
   const state = new uState();
+  const quicklink = new uQuicklink(state);
   const permalink = new uPermalink(state);
   const spinner = new uSpinner(state);
   const mainVM = new MainViewModel(state);
@@ -52,6 +54,8 @@ function start(linkState) {
   const mapVM = new MapViewModel(state);
   const chartVM = new ChartViewModel(state);
   const configVM = new ConfigViewModel(state);
+
+  quicklink.init();
   permalink.init().onPop(linkState);
   spinner.init();
   mainVM.init();

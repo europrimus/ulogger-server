@@ -78,6 +78,7 @@ if ($positionsArr === false) {
       "provider" => $position->provider,
       "comment" => $position->comment,
       "image" => $position->image,
+      "userid" => $position->userId,
       "username" => $position->userLogin,
       "trackid" => $position->trackId,
       "trackname" => $position->trackName,

@@ -176,4 +176,5 @@ $lang["edit"] = "Edit";
 $lang["delete"] = "Delete";
 $lang["settings"] = "Settings";
 $lang["trackcolor"] = "Track color";
+$lang["quicklinktokennotfound"] = "No track to display for this link";
 ?>
